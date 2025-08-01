@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
+import { ClarityClient } from "../utils/types";
 
-function loadEvents(client: any, dir: string) {
+function loadEvents(client: ClarityClient, dir: string) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 
   for (const entry of entries) {

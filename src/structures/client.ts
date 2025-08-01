@@ -1,6 +1,15 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits, Collection, ClientOptions } from "discord.js";
 
-const client = new Client({
+class ClarityClient extends Client {
+  commands: Collection<string, any>;
+
+  constructor(options: ClientOptions) {
+    super(options);
+    this.commands = new Collection();
+  }
+}
+
+const client = new ClarityClient({
   intents: [
     GatewayIntentBits.Guilds,               
     GatewayIntentBits.GuildMessages,        
