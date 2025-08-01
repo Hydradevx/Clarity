@@ -1,14 +1,8 @@
-import { token } from "./utils/EnvHandler.js";
+import path from "path";
+import { token } from "./handlers/EnvHandler.js";
+import { loadEvents } from "./handlers/EventHandler.js";
 import { client } from "./structures/client.js";
 
-client.on('ready', () => {
-  console.log(`Logged in as ${client.user?.tag}`)
-})
-
-client.on('messageCreate', (message: any) => {
-  if(message.content === "ping") {
-    return message.channel.send(`Pong! Ping is ${client.ws.ping}ms`)
-  }
-})
+loadEvents(client, path.join(__dirname, "./events"));
 
 client.login(token)
