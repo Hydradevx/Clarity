@@ -1,13 +1,15 @@
-import { Message } from "discord.js";
 import { ClarityClient } from "../utils/types";
+import { getPrefix, incrementMessageCount } from "../utils/db";
 
 export const name = "messageCreate";
 export const once = false;
 
-const PREFIX = "$";
+export async function execute(client: ClarityClient, message: any) {
+  if (!message.content || message.author.bot || message.guild) return;
 
-export async function execute(client: ClarityClient, message: Message) {
-  if (!message.content || message.author.bot) return;
+  incrementMessageCount(message.guild.id, message.author.id)
+
+  const PREFIX = getPrefix(message.guild.id)
 
   if (!message.content.startsWith(PREFIX)) return;
 
