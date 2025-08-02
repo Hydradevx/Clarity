@@ -5,12 +5,11 @@ export const name = "messageCreate";
 export const once = false;
 
 export async function execute(client: ClarityClient, message: any) {
-  if (!message.content || message.author.bot || message.guild) return;
+  if (!message.content || message.author.bot || !message.guild) return;
 
-  incrementMessageCount(message.guild.id, message.author.id)
+  await incrementMessageCount(message.guild.id, message.author.id);
 
-  const PREFIX = getPrefix(message.guild.id)
-
+  const PREFIX = await getPrefix(message.guild.id);
   if (!message.content.startsWith(PREFIX)) return;
 
   const args = message.content.slice(PREFIX.length).trim().split(/\s+/);
@@ -23,7 +22,7 @@ export async function execute(client: ClarityClient, message: any) {
   try {
     await command.execute(client, message, args);
   } catch (err) {
-    console.error(`❌ Error executing command ${commandName}:`, err);
-    await message.reply("⚠️ There was an error while executing that command!");
+    console.error(`Error executing command ${commandName}:`, err);
+    await message.reply("There was an error while executing that command!");
   }
 }

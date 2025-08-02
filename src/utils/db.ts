@@ -1,7 +1,7 @@
-import Database from "better-sqlite3";
+import mongoose, { Schema, model } from "mongoose";
 
 export interface Reminder {
-  id: number;
+  id: string;
   guild_id: string;
   user_id: string;
   channel_id: string;
@@ -9,93 +9,91 @@ export interface Reminder {
   remind_at: number;
 }
 
-const db = new Database("clarity.db");
+const guildSchema = new Schema({
+  guild_id: { type: String, required: true, unique: true },
+  prefix: { type: String, default: "c!" },
+});
 
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS guilds (
-    guild_id TEXT PRIMARY KEY,
-    prefix TEXT DEFAULT 'c!'
-  )
-`).run();
+const messageCountSchema = new Schema({
+  guild_id: { type: String, required: true },
+  user_id: { type: String, required: true },
+  count: { type: Number, default: 0 },
+});
+messageCountSchema.index({ guild_id: 1, user_id: 1 }, { unique: true });
 
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS message_counts (
-    guild_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    count INTEGER DEFAULT 0,
-    PRIMARY KEY (guild_id, user_id)
-  )
-`).run();
+const reminderSchema = new Schema({
+  guild_id: { type: String, required: true },
+  user_id: { type: String, required: true },
+  channel_id: { type: String, required: true },
+  message: { type: String, required: true },
+  remind_at: { type: Number, required: true },
+});
 
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS reminders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    guild_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    channel_id TEXT NOT NULL,
-    message TEXT NOT NULL,
-    remind_at INTEGER NOT NULL
-  )
-`).run();
+const Guild = model("Guild", guildSchema);
+const MessageCount = model("MessageCount", messageCountSchema);
+const ReminderModel = model("Reminder", reminderSchema);
 
-export function getPrefix(guildId: string): string {
-  const row = db.prepare(`SELECT prefix FROM guilds WHERE guild_id = ?`).get(guildId) as { prefix?: string };
-  return row?.prefix ?? "c!";
+export async function initDB() {
+  await mongoose.connect(process.env.MONGO_URI as string);
+  console.log('Database connected!')
 }
 
-export function setPrefix(guildId: string, prefix: string) {
-  db.prepare(`
-    INSERT INTO guilds (guild_id, prefix) VALUES (?, ?)
-    ON CONFLICT(guild_id) DO UPDATE SET prefix=excluded.prefix
-  `).run(guildId, prefix);
+export async function getPrefix(guildId: string): Promise<string> {
+  const guild = await Guild.findOne({ guild_id: guildId }).lean();
+  return guild?.prefix ?? "c!";
 }
 
-export function incrementMessageCount(guildId: string, userId: string) {
-  db.prepare(`
-    INSERT INTO message_counts (guild_id, user_id, count)
-    VALUES (?, ?, 1)
-    ON CONFLICT(guild_id, user_id) DO UPDATE SET count = count + 1
-  `).run(guildId, userId);
+export async function setPrefix(guildId: string, prefix: string) {
+  await Guild.findOneAndUpdate(
+    { guild_id: guildId },
+    { prefix },
+    { upsert: true }
+  );
 }
 
-export function getUserMessageCount(guildId: string, userId: string): number {
-  const row = db.prepare(`
-    SELECT count FROM message_counts
-    WHERE guild_id = ? AND user_id = ?
-  `).get(guildId, userId) as { count?: number };
-  return row?.count ?? 0;
+export async function incrementMessageCount(guildId: string, userId: string) {
+  await MessageCount.findOneAndUpdate(
+    { guild_id: guildId, user_id: userId },
+    { $inc: { count: 1 } },
+    { upsert: true, new: true }
+  );
 }
 
-export function getTopUsers(guildId: string, limit = 5) {
-  return db.prepare(`
-    SELECT user_id, count 
-    FROM message_counts
-    WHERE guild_id = ?
-    ORDER BY count DESC
-    LIMIT ?
-  `).all(guildId, limit) as { user_id: string; count: number }[];
+export async function getUserMessageCount(
+  guildId: string,
+  userId: string
+): Promise<number> {
+  const entry = await MessageCount.findOne({ guild_id: guildId, user_id: userId }).lean();
+  return entry?.count ?? 0;
 }
 
-export function addReminder(
+export async function getTopUsers(guildId: string, limit = 5) {
+  return MessageCount.find({ guild_id: guildId })
+    .sort({ count: -1 })
+    .limit(limit)
+    .lean();
+}
+
+export async function addReminder(
   guildId: string,
   userId: string,
   channelId: string,
   message: string,
   remindAt: number
 ) {
-  db.prepare(`
-    INSERT INTO reminders (guild_id, user_id, channel_id, message, remind_at)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(guildId, userId, channelId, message, remindAt);
+  await ReminderModel.create({
+    guild_id: guildId,
+    user_id: userId,
+    channel_id: channelId,
+    message,
+    remind_at: remindAt,
+  });
 }
 
-export function getDueReminders(): Reminder[] {
-  return db.prepare(`
-    SELECT * FROM reminders
-    WHERE remind_at <= ?
-  `).all(Date.now()) as Reminder[];
+export async function getDueReminders(): Promise<Reminder[]> {
+  return ReminderModel.find({ remind_at: { $lte: Date.now() } }).lean() as unknown as Reminder[];
 }
 
-export function deleteReminder(id: number) {
-  db.prepare(`DELETE FROM reminders WHERE id = ?`).run(id);
+export async function deleteReminder(id: string) {
+  await ReminderModel.findByIdAndDelete(id);
 }
