@@ -1,6 +1,7 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Schema, model, Types } from "mongoose";
 
 export interface Reminder {
+  _id?: Types.ObjectId,
   id: string;
   guild_id: string;
   user_id: string;
