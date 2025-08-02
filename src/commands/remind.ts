@@ -16,11 +16,15 @@ function parseTime(input: string) {
 
 export async function execute(client: ClarityClient, message: any, args: string[]) {
   if (!message.guild) return;
-  if (args.length < 2) return message.reply("Usage: `<time> <message>` (e.g., `10m Take a break`)");
+  if (args.length < 2) {
+    return message.reply(
+      "Usage: `<time> <message>`\nExample: `10m Take a break`"
+    );
+  }
 
   const timeStr = args.shift()!;
   const duration = parseTime(timeStr);
-  if (!duration) return message.reply("Invalid time format. Use s/m/h/d.");
+  if (!duration) return message.reply("Invalid time format. Use `s/m/h/d`.");
 
   const remindAt = Date.now() + duration;
   const reminderMessage = args.join(" ");
@@ -29,10 +33,11 @@ export async function execute(client: ClarityClient, message: any, args: string[
 
   const embed = new EmbedBuilder()
     .setColor("#FFD700")
-    .setTitle("Reminder Set")
+    .setTitle("⏰ Reminder Set!")
     .setDescription(
-      `I will remind you in **${timeStr}**.\n` +
-      `Message: **${reminderMessage}**`
+      `**Your reminder has been created!**\n\n` +
+      `⏳ **Time:** ${timeStr}\n` +
+      `💬 **Message:** ${reminderMessage}`
     )
     .setFooter({ text: `Reminder created by ${message.author.tag}` })
     .setTimestamp(remindAt);
