@@ -8,7 +8,30 @@ export const aliases: string[] = [];
 export async function execute(client: ClarityClient, message: any, args: string[]) {
   if (!message.guild) return;
 
+  const isOwner = message.guild.ownerId === message.author.id;
   const currentPrefix = await getPrefix(message.guild.id);
+
+  if (!isOwner && args.length === 0) {
+    const embed = new EmbedBuilder()
+      .setColor("#00BFFF")
+      .setTitle("<:emoji_36:1401088664683155549> Server Prefix")
+      .setDescription(`**Current Prefix:** \`${currentPrefix}\``)
+      .setFooter({ text: `Requested by ${message.author.tag}` })
+      .setTimestamp();
+
+    return message.channel.send({ embeds: [embed] });
+  }
+
+  if (!isOwner && args.length > 0) {
+    const embed = new EmbedBuilder()
+      .setColor("#FF5555")
+      .setTitle("🚫 Permission Denied")
+      .setDescription("Only the **server owner** can change the prefix.")
+      .setFooter({ text: `Requested by ${message.author.tag}` })
+      .setTimestamp();
+
+    return message.channel.send({ embeds: [embed] });
+  }
 
   if (args.length === 0) {
     const embed = new EmbedBuilder()
@@ -36,7 +59,7 @@ export async function execute(client: ClarityClient, message: any, args: string[
 
     const collector = reply.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 30_000 // 30 seconds
+      time: 30_000
     });
 
     collector.on("collect", async (interaction: any) => {
@@ -64,12 +87,20 @@ export async function execute(client: ClarityClient, message: any, args: string[
         }
 
         await setPrefix(message.guild.id, newPrefix);
-        return message.channel.send(`✅ Prefix updated to: \`${newPrefix}\``);
+
+        const successEmbed = new EmbedBuilder()
+          .setColor("#00FF7F")
+          .setTitle("✅ Prefix Updated")
+          .setDescription(`New prefix is now: \`${newPrefix}\``)
+          .setFooter({ text: `Changed by ${message.author.tag}` })
+          .setTimestamp();
+
+        return message.channel.send({ embeds: [successEmbed] });
       }
     });
 
     collector.on("end", () => {
-      reply.edit({ components: [] }); 
+      reply.edit({ components: [] });
     });
 
     return;
@@ -81,5 +112,13 @@ export async function execute(client: ClarityClient, message: any, args: string[
   }
 
   await setPrefix(message.guild.id, newPrefix);
-  return message.channel.send(`✅ Prefix updated to: \`${newPrefix}\``);
-}
+
+  const embed = new EmbedBuilder()
+    .setColor("#00FF7F")
+    .setTitle("✅ Prefix Updated")
+    .setDescription(`New prefix is now: \`${newPrefix}\``)
+    .setFooter({ text: `Changed by ${message.author.tag}` })
+    .setTimestamp();
+
+  return message.channel.send({ embeds: [embed] });
+}1
