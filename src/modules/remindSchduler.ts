@@ -29,5 +29,5 @@ export function startReminderScheduler(client: ClarityClient) {
         console.error(`Failed to send reminder ${reminder._id || reminder.id}:`, err);
       }
     }
-  }, 6_000); 
+  }, 10_000); 
 }

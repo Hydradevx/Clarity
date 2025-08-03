@@ -1,35 +1,30 @@
 import { EmbedBuilder } from "discord.js";
 import { ClarityClient } from "../utils/types";
-import { getTopUsers } from "../utils/db";
-import { getPrefix } from "../utils/db";
 
 export const name = "stats";
-export const aliases: string[] = [];
+export const description = "Shows server statistics";
 
 export async function execute(client: ClarityClient, message: any) {
   if (!message.guild) return;
 
-  const prefix = await getPrefix(message.guild.id);
-  const topUsers = await getTopUsers(message.guild.id, 3);
-  const totalMembers = message.guild.memberCount;
-  const totalChannels = message.guild.channels.cache.size;
-
-  const leaderboard = topUsers
-    .map((user, index) => `**${index + 1}.** <@${user.user_id}> — ${user.count} msgs`)
-    .join("\n") || "No messages yet!";
+  const { guild } = message;
+  const icon = guild.iconURL({ size: 1024 });
 
   const embed = new EmbedBuilder()
     .setColor("#00BFFF")
-    .setTitle(`📊 Server Stats — ${message.guild.name}`)
-    .setThumbnail(message.guild.iconURL({ size: 1024 }) || undefined)
-    .addFields(
-      { name: "👥 Members", value: `${totalMembers}`, inline: true },
-      { name: "📂 Channels", value: `${totalChannels}`, inline: true },
-      { name: "🔹 Prefix", value: `\`${prefix}\``, inline: true },
-      { name: "🏆 Top Users", value: leaderboard, inline: false },
+    .setTitle(`<:emoji_36:1401088664683155549> Server Stats — ${guild.name}`)
+    .setDescription(
+      [
+        `<:emoji_20:1401110003791827031> **Members:** ${guild.memberCount}`,
+        `<:emoji_23:1401121271609294899> **Channels:** ${guild.channels.cache.size}`,
+        `<:emoji_22:1401113594879283220> **Roles:** ${guild.roles.cache.size}`,
+        `<:emoji_23:1401121271609294899> **Created:** <t:${Math.floor(guild.createdTimestamp / 1000)}:D>`,
+      ].join("\n")
     )
     .setFooter({ text: `Requested by ${message.author.tag}` })
     .setTimestamp();
+
+  if (icon) embed.setThumbnail(icon);
 
   await message.channel.send({ embeds: [embed] });
 }

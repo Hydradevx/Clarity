@@ -14,7 +14,7 @@ export async function loadCommands(client: ClarityClient, commandsPath: string) 
 
       if (entry.isDirectory()) {
         scanDir(fullPath); 
-      } else if (entry.name.endsWith(".ts")) {
+      } else if (entry.name.endsWith(".ts") || entry.name.endsWith(".js")) {
         import(fullPath).then(command => {
           if (!command.name || !command.execute) {
             console.warn(`Skipping invalid command: ${entry.name}`);
