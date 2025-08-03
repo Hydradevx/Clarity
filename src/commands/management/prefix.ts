@@ -1,4 +1,9 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from "discord.js";
+import {
+  EmbedBuilder,
+  StringSelectMenuBuilder,
+  ActionRowBuilder,
+  ComponentType
+} from "discord.js";
 import { setPrefix, getPrefix } from "../../utils/db";
 import { ClarityClient } from "../../utils/types";
 
@@ -14,9 +19,12 @@ export async function execute(client: ClarityClient, message: any, args: string[
   if (!isOwner && args.length === 0) {
     const embed = new EmbedBuilder()
       .setColor("#00BFFF")
-      .setTitle("<:emoji_36:1401088664683155549> Server Prefix")
+      .setAuthor({
+        name: "Server Prefix",
+        iconURL: "https://cdn.discordapp.com/emojis/1401112155406991433.gif?size=48&quality=lossless"
+      })
       .setDescription(`**Current Prefix:** \`${currentPrefix}\``)
-      .setFooter({ text: `Requested by ${message.author.tag}` })
+      .setFooter({ text: `Requested by ${message.author.tag}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
       .setTimestamp();
 
     return message.channel.send({ embeds: [embed] });
@@ -27,51 +35,53 @@ export async function execute(client: ClarityClient, message: any, args: string[
       .setColor("#FF5555")
       .setTitle("🚫 Permission Denied")
       .setDescription("Only the **server owner** can change the prefix.")
-      .setFooter({ text: `Requested by ${message.author.tag}` })
+      .setFooter({ text: `Requested by ${message.author.tag}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
       .setTimestamp();
 
     return message.channel.send({ embeds: [embed] });
   }
 
-  if (args.length === 0) {
+  if (args.length === 0 && isOwner) {
     const embed = new EmbedBuilder()
       .setColor("#00BFFF")
-      .setTitle("<:emoji_36:1401088664683155549> Server Prefix")
+      .setAuthor({
+        name: "Server Prefix Settings",
+        iconURL: "https://cdn.discordapp.com/emojis/1401112155406991433.gif?size=48&quality=lossless"
+      })
       .setDescription(
-        `**Current Prefix:** \`${currentPrefix}\`\n\n` +
-        `Use the buttons below to **view** or **change** the prefix.`
+        `**Current Prefix:** \`${currentPrefix}\`\n` +
+        `Select an option below to **view** or **change** the prefix.`
       )
-      .setFooter({ text: `Requested by ${message.author.tag}` })
+      .setFooter({ text: `Requested by ${message.author.tag}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
       .setTimestamp();
 
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("view_prefix")
-        .setLabel("View Prefix")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("change_prefix")
-        .setLabel("Change Prefix")
-        .setStyle(ButtonStyle.Success)
-    );
+    const menu = new StringSelectMenuBuilder()
+      .setCustomId("prefix_menu")
+      .setPlaceholder("Choose an option")
+      .addOptions([
+        { label: "View Prefix", value: "view_prefix", emoji: "👁️" },
+        { label: "Change Prefix", value: "change_prefix", emoji: "✏️" }
+      ]);
+
+    const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
 
     const reply = await message.channel.send({ embeds: [embed], components: [row] });
 
     const collector = reply.createMessageComponentCollector({
-      componentType: ComponentType.Button,
+      componentType: ComponentType.StringSelect,
       time: 30_000
     });
 
     collector.on("collect", async (interaction: any) => {
       if (interaction.user.id !== message.author.id) {
-        return interaction.reply({ content: "You cannot use this button.", ephemeral: true });
+        return interaction.reply({ content: "You cannot use this menu.", ephemeral: true });
       }
 
-      if (interaction.customId === "view_prefix") {
+      if (interaction.values[0] === "view_prefix") {
         await interaction.reply({ content: `The current prefix is: \`${currentPrefix}\``, ephemeral: true });
       }
 
-      if (interaction.customId === "change_prefix") {
+      if (interaction.values[0] === "change_prefix") {
         await interaction.reply({ content: "Please type the new prefix in chat.", ephemeral: true });
 
         const filter = (m: any) => m.author.id === message.author.id;
@@ -92,15 +102,18 @@ export async function execute(client: ClarityClient, message: any, args: string[
           .setColor("#00FF7F")
           .setTitle("✅ Prefix Updated")
           .setDescription(`New prefix is now: \`${newPrefix}\``)
-          .setFooter({ text: `Changed by ${message.author.tag}` })
+          .setFooter({ text: `Changed by ${message.author.tag}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
           .setTimestamp();
 
         return message.channel.send({ embeds: [successEmbed] });
       }
+
+      collector.stop();
+      await reply.edit({ components: [] });
     });
 
     collector.on("end", () => {
-      reply.edit({ components: [] });
+      reply.edit({ components: [] }).catch(() => {});
     });
 
     return;
@@ -117,8 +130,8 @@ export async function execute(client: ClarityClient, message: any, args: string[
     .setColor("#00FF7F")
     .setTitle("✅ Prefix Updated")
     .setDescription(`New prefix is now: \`${newPrefix}\``)
-    .setFooter({ text: `Changed by ${message.author.tag}` })
+    .setFooter({ text: `Changed by ${message.author.tag}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
     .setTimestamp();
 
   return message.channel.send({ embeds: [embed] });
-}1
+}

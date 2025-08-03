@@ -12,11 +12,18 @@ export async function execute(client: ClarityClient, message: any) {
 
   const embed = new EmbedBuilder()
     .setColor("#FFD700")
-    .setTitle(`<:emoji_20:1401110003791827031> Message Stats`)
+    .setAuthor({
+      name: `${message.author.username}'s Message Stats`,
+      iconURL: message.author.displayAvatarURL({ dynamic: true })
+    })
+    .setTitle("<a:emoji_21:1401112155406991433> Messages Overview")
     .setDescription(
-      `You have sent **${count} messages** in **${message.guild.name}**!`
+      `📨 You have sent **${count.toLocaleString()} messages** in **${message.guild.name}**!`
     )
-    .setFooter({ text: `Requested by ${message.author.tag}` })
+    .setFooter({
+      text: `Requested by ${message.author.tag}`,
+      iconURL: message.author.displayAvatarURL({ dynamic: true })
+    })
     .setTimestamp();
 
   await message.channel.send({ embeds: [embed] });

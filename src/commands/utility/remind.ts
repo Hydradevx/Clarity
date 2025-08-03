@@ -21,6 +21,7 @@ function humanFriendlyTime(value: number, unit: string) {
 
 export async function execute(client: ClarityClient, message: any, args: string[]) {
   if (!message.guild) return;
+
   if (args.length < 2) {
     return message.reply("Usage: `<time> <message>`\nExample: `10m Take a break`");
   }
@@ -38,13 +39,19 @@ export async function execute(client: ClarityClient, message: any, args: string[
 
   const embed = new EmbedBuilder()
     .setColor("#FFD700")
-    .setTitle("⏰ Reminder Set!")
+    .setAuthor({
+      name: `${message.author.username}'s Reminder`,
+      iconURL: message.author.displayAvatarURL({ dynamic: true })
+    })
+    .setTitle("<a:emoji_21:1401112155406991433> Reminder Set!")
     .setDescription(
-      `**Your reminder has been created!**\n\n` +
       `⏳ **Time:** ${friendlyTime} *(<t:${Math.floor(remindAt / 1000)}:R>)*\n` +
       `💬 **Message:** ${reminderMessage}`
     )
-    .setFooter({ text: `Reminder created by ${message.author.tag}` })
+    .setFooter({
+      text: `Reminder created by ${message.author.tag}`,
+      iconURL: message.author.displayAvatarURL({ dynamic: true })
+    })
     .setTimestamp(remindAt);
 
   await message.channel.send({ embeds: [embed] });
