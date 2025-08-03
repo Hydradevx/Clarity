@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
-import { ClarityClient } from "../utils/types";
-import { getUserMessageCount } from "../utils/db";
+import { ClarityClient } from "../../utils/types";
+import { getUserMessageCount } from "../../utils/db";
 
 export const name = "messages";
 export const description = "Check your total message count in this server";

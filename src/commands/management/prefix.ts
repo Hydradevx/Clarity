@@ -1,6 +1,6 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from "discord.js";
-import { setPrefix, getPrefix } from "../utils/db";
-import { ClarityClient } from "../utils/types";
+import { setPrefix, getPrefix } from "../../utils/db";
+import { ClarityClient } from "../../utils/types";
 
 export const name = "prefix";
 export const aliases: string[] = [];
