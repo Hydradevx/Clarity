@@ -6,6 +6,7 @@ import {
   ComponentType
 } from "discord.js";
 import { ClarityClient } from "../../utils/types";
+import { Emojis } from "../../utils/emojiConfig";
 
 export const name = "help";
 export const description = "Displays all command categories";
@@ -37,11 +38,11 @@ export async function execute(client: ClarityClient, message: any) {
       name: `Clarity Help Menu`,
       iconURL: "https://cdn.discordapp.com/emojis/1401112155406991433.gif?size=64&quality=lossless"
     })
-    .setTitle("<a:emoji_21:1401112155406991433> Welcome to Clarity <a:emoji_21:1401112155406991433>")
+    .setTitle(`${Emojis.bolt} Welcome to Clarity ${Emojis.bolt}`)
     .setDescription(
       `> **Explore all ${totalCommands} commands available!**\n` +
       `> Use the dropdown below to view commands by category.\n\n` +
-      `**Support:** [GitHub](https://github.com/Hydradevx/Clarity) ・ [Discord](https://discord.gg/FkUDYSrw3d)`
+      `**Support:** ${Emojis.github}[GitHub](https://github.com/Hydradevx/Clarity) ・ [Discord](https://discord.gg/FkUDYSrw3d)`
     )
     .setFooter({
       text: `Requested by ${message.author.tag}`,
@@ -104,11 +105,11 @@ export async function execute(client: ClarityClient, message: any) {
 
 function getCategoryEmoji(category: string): string {
   const map: Record<string, string> = {
-    Utility: "<:util:1401374501014343803>",
-    Management: "<:management:1401374804375896095>",
-    Moderation: "<:mod:1401374197032161361>",
-    Fun: "<:game:1401370664568361052>",
-    General: "<:blue_crown:1387781705225736203>"
+    Utility: `${Emojis.utility}`,
+    Management: `${Emojis.management}`,
+    Moderation: `${Emojis.moderation}`,
+    Fun: `${Emojis.fun}`,
+    General: `${Emojis.general}`
   };
   return map[category] || "📂";
 }

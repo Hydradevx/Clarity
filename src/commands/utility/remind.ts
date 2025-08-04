@@ -1,6 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import { ClarityClient } from "../../utils/types";
 import { addReminder } from "../../utils/db";
+import { Emojis } from "../../utils/emojiConfig";
 
 export const name = "remind";
 export const description = "Sets a reminder";
@@ -43,7 +44,7 @@ export async function execute(client: ClarityClient, message: any, args: string[
       name: `${message.author.username}'s Reminder`,
       iconURL: message.author.displayAvatarURL({ dynamic: true })
     })
-    .setTitle("<a:emoji_21:1401112155406991433> Reminder Set!")
+    .setTitle(`${Emojis.bolt} Reminder Set!`)
     .setDescription(
       `⏳ **Time:** ${friendlyTime} *(<t:${Math.floor(remindAt / 1000)}:R>)*\n` +
       `💬 **Message:** ${reminderMessage}`

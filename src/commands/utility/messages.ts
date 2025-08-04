@@ -1,6 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import { ClarityClient } from "../../utils/types";
 import { getUserMessageCount } from "../../utils/db";
+import { Emojis } from "../../utils/emojiConfig";
 
 export const name = "messages";
 export const description = "Check your total message count in this server";
@@ -16,7 +17,7 @@ export async function execute(client: ClarityClient, message: any) {
       name: `${message.author.username}'s Message Stats`,
       iconURL: message.author.displayAvatarURL({ dynamic: true })
     })
-    .setTitle("<a:emoji_21:1401112155406991433> Messages Overview")
+    .setTitle(`${Emojis.bolt}`)
     .setDescription(
       `📨 You have sent **${count.toLocaleString()} messages** in **${message.guild.name}**!`
     )

@@ -1,5 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 import { ClarityClient } from "../../utils/types";
+import { Emojis } from "../../utils/emojiConfig";
 
 export const name = "stats";
 export const description = "Shows server statistics";
@@ -18,10 +19,10 @@ export async function execute(client: ClarityClient, message: any) {
     })
     .setDescription(
       [
-        `<:emoji_20:1401110003791827031> **Members:** ${guild.memberCount}`,
-        `<:emoji_23:1401121271609294899> **Channels:** ${guild.channels.cache.size}`,
-        `<:emoji_22:1401113594879283220> **Roles:** ${guild.roles.cache.size}`,
-        `<:emoji_36:1401088664683155549> **Created:** <t:${Math.floor(
+        `${Emojis.general} **Members:** ${guild.memberCount}`,
+        `${Emojis.arrow} **Channels:** ${guild.channels.cache.size}`,
+        `${Emojis.utility} **Roles:** ${guild.roles.cache.size}`,
+        `${Emojis.server} **Created:** <t:${Math.floor(
           guild.createdTimestamp / 1000
         )}:D> ・ <t:${Math.floor(guild.createdTimestamp / 1000)}:R>`,
       ].join("\n")
