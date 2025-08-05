@@ -18,16 +18,25 @@ export async function execute(client: ClarityClient, message: any) {
   const totalCommands = commands.size;
 
   const categories: Record<string, any[]> = {};
-  for (const [cmdName, cmd] of commands) {
+  for (const [, cmd] of commands) {
     const category = cmd.category || "General";
     if (!categories[category]) categories[category] = [];
     categories[category].push(cmd);
   }
 
-  const categoryOptions = Object.keys(categories).map((cat) =>
+  const categoryNames = Object.keys(categories).sort();
+
+  const overview = categoryNames
+    .map(
+      (cat) =>
+        `${getCategoryEmoji(cat)} **${cat}** `
+    )
+    .join("\n");
+
+  const categoryOptions = categoryNames.map((cat) =>
     new StringSelectMenuOptionBuilder()
-      .setLabel(cat)
-      .setDescription(`View ${categories[cat].length} commands in ${cat}`)
+      .setLabel(`${cat} (${categories[cat].length})`)
+      .setDescription(`View ${categories[cat].length} commands`)
       .setEmoji(getCategoryEmoji(cat))
       .setValue(cat.toLowerCase())
   );
@@ -36,13 +45,16 @@ export async function execute(client: ClarityClient, message: any) {
     .setColor("#00BFFF")
     .setAuthor({
       name: `Clarity Help Menu`,
-      iconURL: "https://cdn.discordapp.com/emojis/1401112155406991433.gif?size=64&quality=lossless"
+      iconURL:
+        "https://cdn.discordapp.com/emojis/1401112155406991433.gif?size=64&quality=lossless"
     })
     .setTitle(`${Emojis.bolt} Welcome to Clarity ${Emojis.bolt}`)
     .setDescription(
-      `> **Explore all ${totalCommands} commands available!**\n` +
-      `> Use the dropdown below to view commands by category.\n\n` +
-      `**Support:** ${Emojis.github}[GitHub](https://github.com/Hydradevx/Clarity) ・ [Discord](https://discord.gg/FkUDYSrw3d)`
+      `> **Explore all ${totalCommands} commands available!**\n\n` +
+        `**Categories:**\n${overview}\n\n` +
+        `**Support Links:**\n` +
+        `${Emojis.github} [GitHub Repository](https://github.com/Hydradevx/Clarity)\n` +
+        `🌐 [Discord Server](https://discord.gg/FkUDYSrw3d)`
     )
     .setFooter({
       text: `Requested by ${message.author.tag}`,
@@ -55,9 +67,13 @@ export async function execute(client: ClarityClient, message: any) {
     .setPlaceholder("Choose a command category")
     .addOptions(categoryOptions);
 
-  const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
+  const row =
+    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 
-  const reply = await message.channel.send({ embeds: [embed], components: [row] });
+  const reply = await message.channel.send({
+    embeds: [embed],
+    components: [row]
+  });
 
   const collector = reply.createMessageComponentCollector({
     componentType: ComponentType.StringSelect,
@@ -66,27 +82,36 @@ export async function execute(client: ClarityClient, message: any) {
 
   collector.on("collect", async (interaction: any) => {
     if (interaction.user.id !== message.author.id) {
-      return interaction.reply({ content: "You cannot use this menu.", ephemeral: true });
+      return interaction.reply({
+        content: "You cannot use this menu.",
+        ephemeral: true
+      });
     }
 
     const selected = interaction.values[0];
-    const selectedCategory = Object.keys(categories).find(
+    const selectedCategory = categoryNames.find(
       (cat) => cat.toLowerCase() === selected
     );
     if (!selectedCategory) return;
 
     const categoryCommands = categories[selectedCategory];
     const formattedCommands = categoryCommands
-      .map((cmd) => `\`${cmd.name}\` - ${cmd.description || "No description"}`)
+      .map(
+        (cmd) =>
+          `${getCategoryEmoji(cmd.category || "General")} **${cmd.name}** — ${
+            cmd.description || "No description"
+          }`
+      )
       .join("\n");
 
     const categoryEmbed = new EmbedBuilder()
       .setColor("#FFD700")
       .setAuthor({
         name: `${selectedCategory} Commands`,
-        iconURL: "https://cdn.discordapp.com/emojis/1401112155406991433.gif?size=64&quality=lossless"
+        iconURL:
+          "https://cdn.discordapp.com/emojis/1401112155406991433.gif?size=64&quality=lossless"
       })
-      .setDescription(formattedCommands || "No commands in this category.")
+      .setDescription(formattedCommands || "_No commands in this category._")
       .setFooter({
         text: `Requested by ${message.author.tag}`,
         iconURL: message.author.displayAvatarURL({ dynamic: true })
@@ -97,19 +122,14 @@ export async function execute(client: ClarityClient, message: any) {
     collector.stop();
   });
 
-  collector.on("end", () => {
-    if (!reply.editable) return;
-    reply.edit({ components: [] }).catch(() => {});
+  collector.on("end", async () => {
+    if (reply.editable) {
+      reply.edit({ components: [] }).catch(() => {});
+    }
   });
 }
 
 function getCategoryEmoji(category: string): string {
-  const map: Record<string, string> = {
-    Utility: `${Emojis.utility}`,
-    Management: `${Emojis.management}`,
-    Moderation: `${Emojis.moderation}`,
-    Fun: `${Emojis.fun}`,
-    General: `${Emojis.general}`
-  };
-  return map[category] || "📂";
+  const key = category.toLowerCase();
+  return Emojis[key] || "📂";
 }
