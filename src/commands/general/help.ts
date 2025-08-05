@@ -5,8 +5,8 @@ import {
   StringSelectMenuOptionBuilder,
   ComponentType
 } from "discord.js";
-import { ClarityClient } from "../../utils/types";
-import { Emojis } from "../../utils/emojiConfig";
+import { ClarityClient } from "../../utils/types.js";
+import { Emojis } from "../../utils/emojiConfig.js";
 
 export const name = "help";
 export const description = "Displays all command categories";

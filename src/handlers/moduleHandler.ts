@@ -1,5 +1,5 @@
-import { startReminderScheduler } from "../modules/remindSchduler";
-import { ClarityClient } from "../utils/types";
+import { startReminderScheduler } from "../modules/remindScheduler.js";
+import { ClarityClient } from "../utils/types.js";
 
 export async function loadModules(client: ClarityClient) {
   startReminderScheduler(client);

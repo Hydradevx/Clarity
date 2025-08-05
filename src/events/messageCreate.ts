@@ -1,5 +1,5 @@
-import { ClarityClient } from "../utils/types";
-import { getPrefix, incrementMessageCount } from "../utils/db";
+import { ClarityClient } from "../utils/types.js";
+import { getPrefix, incrementMessageCount } from "../utils/db.js";
 
 export const name = "messageCreate";
 export const once = false;

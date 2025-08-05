@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
-import { ClarityClient } from "../../utils/types";
-import { Emojis } from "../../utils/emojiConfig";
+import { ClarityClient } from "../../utils/types.js";
+import { Emojis } from "../../utils/emojiConfig.js";
 
 export const name = "stats";
 export const description = "Shows server statistics";

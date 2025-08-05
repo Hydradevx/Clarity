@@ -4,8 +4,8 @@ import {
   ActionRowBuilder,
   ComponentType
 } from "discord.js";
-import { setPrefix, getPrefix } from "../../utils/db";
-import { ClarityClient } from "../../utils/types";
+import { setPrefix, getPrefix } from "../../utils/db.js";
+import { ClarityClient } from "../../utils/types.js";
 
 export const name = "prefix";
 export const aliases: string[] = [];

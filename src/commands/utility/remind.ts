@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
-import { ClarityClient } from "../../utils/types";
-import { addReminder } from "../../utils/db";
-import { Emojis } from "../../utils/emojiConfig";
+import { ClarityClient } from "../../utils/types.js";
+import { addReminder } from "../../utils/db.js";
+import { Emojis } from "../../utils/emojiConfig.js";
 
 export const name = "remind";
 export const description = "Sets a reminder";

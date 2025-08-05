@@ -1,4 +1,4 @@
-import { ClarityClient } from "../utils/types";
+import { ClarityClient } from "../utils/types.js";
 
 export const name = "ready";
 export const once = true;

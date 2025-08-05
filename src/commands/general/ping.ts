@@ -1,5 +1,5 @@
 import { EmbedBuilder } from "discord.js";
-import { ClarityClient } from "../../utils/types";
+import { ClarityClient } from "../../utils/types.js";
 
 export const name = "ping";
 

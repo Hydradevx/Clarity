@@ -1,6 +1,6 @@
 import { EmbedBuilder, TextChannel } from "discord.js";
-import { getDueReminders, deleteReminder } from "../utils/db";
-import { ClarityClient } from "../utils/types";
+import { getDueReminders, deleteReminder } from "../utils/db.js";
+import { ClarityClient } from "../utils/types.js";
 
 export function startReminderScheduler(client: ClarityClient) {
   setInterval(async () => {

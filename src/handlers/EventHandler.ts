@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ClarityClient } from "../utils/types";
+import { ClarityClient } from "../utils/types.js";
 
 function loadEvents(client: ClarityClient, dir: string) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -10,7 +10,7 @@ function loadEvents(client: ClarityClient, dir: string) {
 
     if (entry.isDirectory()) {
       loadEvents(client, fullPath);
-    } else if (entry.name.endsWith(".ts")) {
+    } else if (entry.name.endsWith(".js")) {
       import(fullPath).then(eventModule => {
         const { name, once, execute } = eventModule;
 

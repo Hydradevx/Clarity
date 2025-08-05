@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
-import { ClarityClient } from "../../utils/types";
-import { getUserMessageCount } from "../../utils/db";
-import { Emojis } from "../../utils/emojiConfig";
+import { ClarityClient } from "../../utils/types.js";
+import { getUserMessageCount } from "../../utils/db.js";
+import { Emojis } from "../../utils/emojiConfig.js";
 
 export const name = "messages";
 export const description = "Check your total message count in this server";
