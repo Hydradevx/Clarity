@@ -66,7 +66,7 @@ export async function execute(client, message) {
             return;
         const categoryCommands = categories[selectedCategory];
         const formattedCommands = categoryCommands
-            .map((cmd) => `${getCategoryEmoji(cmd.category || "General")} **${cmd.name}** — ${cmd.description || "No description"}`)
+            .map((cmd) => `${getCategoryEmoji(cmd.category || "General")} **${cmd.name}**`)
             .join("\n");
         const categoryEmbed = new EmbedBuilder()
             .setColor("#FFD700")

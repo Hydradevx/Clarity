@@ -98,9 +98,7 @@ export async function execute(client: ClarityClient, message: any) {
     const formattedCommands = categoryCommands
       .map(
         (cmd) =>
-          `${getCategoryEmoji(cmd.category || "General")} **${cmd.name}** — ${
-            cmd.description || "No description"
-          }`
+          `${getCategoryEmoji(cmd.category || "General")} **${cmd.name}**`
       )
       .join("\n");
 
